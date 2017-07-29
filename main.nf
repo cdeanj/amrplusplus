@@ -1,11 +1,9 @@
 #!/usr/bin/env nextflow
 
-
-
 Channel
     .fromFilePairs( params.reads, flat: true )
     .ifEmpty { exit 1, "Read pair files could not be found: ${params.reads}" }
-    .into { read_pairs }
+    .into { reads }
 
 process RunQC {
     tag { sample_id }
@@ -19,7 +17,7 @@ process RunQC {
         }
 	
     input:
-        set sample_id, file(forward), file(reverse) from read_pairs
+        set sample_id, file(forward), file(reverse) from reads
 
     output:
         set sample_id, file("${sample_id}.1P.fastq"), file("${sample_id}.2P.fastq") into (paired_fastq)
