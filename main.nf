@@ -78,3 +78,21 @@ if( !params.index ) {
         """
     }
 }
+
+process AlignReadsToHost {
+    tag { sample_id }
+        
+    publishDir "${params.output}/Host", mode: "copy"
+        
+    input:
+        set sample_id, file(forward), file(reverse) from paired_fastq
+        file idx from index.first()
+        file host
+            
+    output:
+        set sample_id, file("${sample_id}.host.sam") into host_sam
+            
+    """ 
+    bwa mem ${host} ${forward} ${reverse} -t ${threads} > ${sample_id}.host.sam
+    """ 
+}
