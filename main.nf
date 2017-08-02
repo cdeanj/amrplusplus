@@ -5,9 +5,10 @@ vim: syntax=groovy
 -*- mode: groovy;-*-
 */
 
-if( params.index ) {
-    index = Channel.fromPath(params.index).toSortedList()
-}
+if( params.host_index ) { host_index = Channel.fromPath(params.host_index).toSortedList() }
+if( params.amr_index ) { amr_index = Channel.fromPath(params.amr_index).toSortedList() }
+
+amr = file(params.amr)
 
 host = file(params.host)
 
@@ -63,7 +64,7 @@ process RunQC {
     """
 }
 
-if( !params.index ) {
+if( !params.host_index ) {
     process BuildHostIndex {
         tag { host.baseName }
 
@@ -71,7 +72,7 @@ if( !params.index ) {
             file(host)
 
         output:
-            file '*' into index
+            file '*' into host_index
 
         """
         bwa index ${host}
@@ -86,7 +87,7 @@ process AlignReadsToHost {
         
     input:
         set sample_id, file(forward), file(reverse) from paired_fastq
-        file idx from index.first()
+        file index from host_index.first()
         file host
             
     output:
@@ -132,4 +133,38 @@ process BAMToFASTQ {
       -fq ${sample_id}.non.host.R1.fastq \
       -fq2 ${sample_id}.non.host.R2.fastq
     """
+}
+
+if( !params.amr_index ) {
+    process BuildAMRIndex {
+        tag { amr.baseName }
+
+        input:
+            file(amr)
+
+        output:
+            file '*' into amr_index
+
+        """
+        bwa index ${amr}
+        """
+    }
+}
+
+process AlignToAMR {
+     tag { sample_id }
+
+     publishDir "${params.output}/AMR", mode: "copy"
+
+     input:
+         set sample_id, file(forward), file(reverse) from non_host_fastq
+         file index from amr_index.first()
+         file amr
+
+     output:
+         set sample_id, file("${sample_id}.amr.alignment.sam") into amr_sam
+
+     """
+     bwa mem ${amr} ${forward} ${reverse} -t ${threads} > ${sample_id}.amr.alignment.sam
+     """
 }
