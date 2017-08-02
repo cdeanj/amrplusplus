@@ -7,14 +7,20 @@ vim: syntax=groovy
 
 if( params.host_index ) { host_index = Channel.fromPath(params.host_index).toSortedList() }
 if( params.amr_index ) { amr_index = Channel.fromPath(params.amr_index).toSortedList() }
-
-amr = file(params.amr)
-
-host = file(params.host)
+if( params.host ) { 
+    host = file(params.host) 
+    if( !host.exists() ) exit 1, "Host genome file could not be found: ${params.host}"
+}
+if( params.amr ) { 
+    amr = file(params.amr) 
+    if( !amr.exists() ) exit 1, "AMR database file could not be found: ${params.amr}" 
+}
+if( params.adapters ) { 
+    adapters = file(params.adapters) 
+    if( !adapters.exists() ) exit 1, "Adapter file could not be found: ${params.adapters}" 
+}
 
 threads = params.threads
-
-adapters = file(params.adapters)
 
 leading = params.leading
 trailing = params.trailing
