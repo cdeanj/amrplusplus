@@ -62,3 +62,19 @@ process RunQC {
     mv ${sample_id}_2U ${sample_id}.2U.fastq
     """
 }
+
+if( !params.index ) {
+    process BuildHostIndex {
+        tag { host.baseName }
+
+        input:
+            file(host)
+
+        output:
+            file '*' into index
+
+        """
+        bwa index ${host}
+        """
+    }
+}
