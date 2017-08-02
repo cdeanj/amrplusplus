@@ -106,10 +106,30 @@ process RemoveHostDNA {
         set sample_id, file(sam) from host_sam
 
     output:
-        set sample_id, file("${sample_id}.host.sorted.removed.bam") into host_bam
+        set sample_id, file("${sample_id}.host.sorted.removed.bam") into non_host_bam
 
     """
     samtools view -bS ${sam} | samtools sort -@ ${threads} -o ${sample_id}.host.sorted.bam
     samtools view -h -f 4 -b ${sample_id}.host.sorted.bam -o ${sample_id}.host.sorted.removed.bam
+    """
+}
+
+process BAMToFASTQ {
+    tag { sample_id }
+
+    publishDir "${params.output}/Host", mode: "copy"
+
+    input:
+        set sample_id, file(bam) from non_host_bam
+
+    output:
+        set sample_id, file("${sample_id}.non.host.R1.fastq"), file("${sample_id}.non.host.R2.fastq") into non_host_fastq
+
+    """
+    bedtools  \
+       bamtofastq \
+      -i ${bam} \
+      -fq ${sample_id}.non.host.R1.fastq \
+      -fq2 ${sample_id}.non.host.R2.fastq
     """
 }
