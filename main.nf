@@ -5,6 +5,11 @@ vim: syntax=groovy
 -*- mode: groovy;-*-
 */
 
+if( !nextflow.version.matches('0.25+') ) {
+    println "This workflow requires Nextflow version 0.25 or greater -- You are running version $nextflow.version"
+    println "Run ./nextflow self-update to update Nextflow to the latest available version."
+    exit 1
+}
 if( params.host_index ) { host_index = Channel.fromPath(params.host_index).toSortedList() }
 if( params.amr_index ) { amr_index = Channel.fromPath(params.amr_index).toSortedList() }
 if( params.host ) { 
