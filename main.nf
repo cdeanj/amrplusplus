@@ -1,5 +1,25 @@
 #!/usr/bin/env nextflow
 
+/*
+vim: syntax=groovy
+-*- mode: groovy;-*-
+*/
+
+if( params.index ) {
+    index = Channel.fromPath(params.index).toSortedList()
+}
+
+host = file(params.host)
+
+threads = params.threads
+
+adapters = file(params.adapters)
+
+leading = params.leading
+trailing = params.trailing
+slidingwindow = params.slidingwindow
+minlen = params.minlen
+
 Channel
     .fromFilePairs( params.reads, flat: true )
     .ifEmpty { exit 1, "Read pair files could not be found: ${params.reads}" }
@@ -28,7 +48,7 @@ process RunQC {
     java -jar ${TRIMMOMATIC}/trimmomatic-0.36.jar \
       PE \
       -threads ${threads} \
-      $forward $reverse -baseout ${dataset_id} \
+      $forward $reverse -baseout ${sample_id} \
       ILLUMINACLIP:${adapters}:2:30:10:3:TRUE \
       LEADING:${leading} \
       TRAILING:${trailing} \
