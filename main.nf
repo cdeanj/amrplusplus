@@ -10,8 +10,14 @@ if( !nextflow.version.matches('0.25+') ) {
     println "Run ./nextflow self-update to update Nextflow to the latest available version."
     exit 1
 }
-if( params.host_index ) { host_index = Channel.fromPath(params.host_index).toSortedList() }
-if( params.amr_index ) { amr_index = Channel.fromPath(params.amr_index).toSortedList() }
+if( params.host_index ) { 
+    host_index = Channel.fromPath(params.host_index).toSortedList() 
+    if( !host_index.exists() ) exit 1, "Host index files could not be found: ${params.host_index}"    
+}
+if( params.amr_index ) { 
+    amr_index = Channel.fromPath(params.amr_index).toSortedList() 
+    if( !amr_index.exists() ) exit 1, "AMR index files could not be found: ${params.amr_index}"
+}
 if( params.host ) { 
     host = file(params.host) 
     if( !host.exists() ) exit 1, "Host genome file could not be found: ${params.host}"
