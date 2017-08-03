@@ -12,10 +12,10 @@ TODOs
 ### Processes
 
 - [x] Add RunQC process
-- [ ] Add BuildHostIndex process
-- [ ] Add AlignReadsToHost process
-- [ ] Add SamToBAM process
-- [ ] Add RemoveHostDNA process
+- [x] Add BuildHostIndex process
+- [x] Add AlignReadsToHost process
+- [x] Add SamToBAM process
+- [x] Add RemoveHostDNA process
 - [ ] Add RarefactionAnalyzer process
 - [ ] Add ResistomeAnalyzer process
 - [ ] Add SNPFinder process
