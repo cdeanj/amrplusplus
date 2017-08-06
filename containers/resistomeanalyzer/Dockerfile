@@ -18,4 +18,4 @@ RUN cd /opt \
     && git clone https://github.com/cdeanj/resistomeanalyzer.git \
     && cd resistomeanalyzer \
     && make \
-    && ln -s /opt/resistomanalyzer/resistome /usr/local/bin/resistome
+    && ln -s /opt/resistomeanalyzer/resistome /usr/local/bin/resistome
