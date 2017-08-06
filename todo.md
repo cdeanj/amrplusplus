@@ -5,9 +5,9 @@ TODOs
 
 - [ ] Add Kraken container
 - [ ] Add MultiQC container
-- [ ] Add RarefactionAnalyzer container
-- [ ] Add ResistomeAnalyzer container
-- [ ] Add SNPFinder container
+- [x] Add RarefactionAnalyzer container
+- [x] Add ResistomeAnalyzer container
+- [x] Add SNPFinder container
 
 ### Processes
 
@@ -16,8 +16,8 @@ TODOs
 - [x] Add AlignReadsToHost process
 - [x] Add SamToBAM process
 - [x] Add RemoveHostDNA process
-- [ ] Add RarefactionAnalyzer process
-- [ ] Add ResistomeAnalyzer process
-- [ ] Add SNPFinder process
+- [x] Add RarefactionAnalyzer process
+- [x] Add ResistomeAnalyzer process
+- [x] Add SNPFinder process
 - [ ] Add Kraken process
 
