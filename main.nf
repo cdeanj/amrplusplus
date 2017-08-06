@@ -190,17 +190,17 @@ process AlignToAMR {
          file amr
 
      output:
-         set sample_id, file("${sample_id}.amr.alignment.sam") into (resistome_sam, rarefaction_sam)
+         set sample_id, file("${sample_id}.amr.alignment.sam") into (resistome_sam, rarefaction_sam, snp_sam)
 
      """
      bwa mem ${amr} ${forward} ${reverse} -t ${threads} > ${sample_id}.amr.alignment.sam
      """
 }
 
-process AnalyzeResistome {
+process RunResistome {
     tag { sample_id }
 
-    publishDir "${params.output}/AnalyzeResistome", mode: "copy"
+    publishDir "${params.output}/RunResistome", mode: "copy"
 
     input:
         set sample_id, file(sam) from resistome_sam
@@ -223,10 +223,10 @@ process AnalyzeResistome {
     """
 }
 
-process AnalyzeRarefaction {
+process RunRarefaction {
     tag { sample_id }
    
-    publishDir "${params.output}/AnalyzeRarefaction", mode: "copy"
+    publishDir "${params.output}/RunRarefaction", mode: "copy"
 
     input:
         set sample_id, file(sam) from rarefaction_sam
@@ -250,5 +250,25 @@ process AnalyzeRarefaction {
       -skip ${skip} \
       -samples ${samples} \
       -t ${threshold}
+    """
+}
+
+process RunSNPFinder {
+    tag { sample_id }
+
+    publishDir "${params.output}/SNPFinder", mode: "copy"
+
+    input:
+        set sample_id, file(sam) from snp_sam
+        file amr
+
+    output:
+        set sample_id, file("*.tsv") into (snp)
+
+    """
+    snpfinder \
+      -amr_fp ${amr} \
+      -sampe ${sam} \
+      -out_fp ${sample_id}.tsv
     """
 }
