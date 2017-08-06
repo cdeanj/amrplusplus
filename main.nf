@@ -326,7 +326,7 @@ def help() {
     println ""
     println "Program: AmrPlusPlus"
     println "Version: $workflow.repository - $workflow.revision [$workflow.commitId]"
-    println "Documentation: https://github.com/cdeanj/auir/blob/master/README.md"
+    println "Documentation: https://github.com/cdeanj/amrplusplus/blob/master/README.md"
     println "Contact: Christopher Dean <cdean11@colostate.edu>"
     println ""
     println "Usage:    nextflow run main.nf [options]"
