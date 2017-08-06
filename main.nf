@@ -12,27 +12,23 @@ if( !nextflow.version.matches('0.25+') ) {
 }
 if( params.host_index ) { 
     host_index = Channel.fromPath(params.host_index).toSortedList() 
-    if( !host_index.exists() ) exit 1, "Host index files could not be found: ${params.host_index}"    
-}
-if( params.amr_index ) { 
-    amr_index = Channel.fromPath(params.amr_index).toSortedList() 
-    if( !amr_index.exists() ) exit 1, "AMR index files could not be found: ${params.amr_index}"
+    if( !host_index.exists() ) return index_error(host_index)
 }
 if( params.host ) { 
     host = file(params.host) 
-    if( !host.exists() ) exit 1, "Host genome file could not be found: ${params.host}"
+    if( !host.exists() ) return host_error(host)
 }
 if( params.amr ) { 
     amr = file(params.amr) 
-    if( !amr.exists() ) exit 1, "AMR database file could not be found: ${params.amr}" 
+    if( !amr.exists() ) return amr_error(amr)
 }
 if( params.adapters ) { 
     adapters = file(params.adapters) 
-    if( !adapters.exists() ) exit 1, "Adapter file could not be found: ${params.adapters}" 
+    if( !adapters.exists() ) return adapter_error(adapters)
 }
 if( params.annotation ) {
     annotation = file(params.annotation)
-    if( !annotation.exists() ) exit 1, "Annotation file could not be found: ${params.annotation}"
+    if( !annotation.exists() ) return annotation_error(annotation)
 }
 
 threads = params.threads
@@ -273,4 +269,54 @@ process RunSNPFinder {
       -sampe ${sam} \
       -out_fp ${sample_id}.tsv
     """
+}
+
+def nextflow_version_error() {
+    println ""
+    println "This workflow requires Nextflow version 0.25 or greater -- You are running version $nextflow.version"
+    println "Run ./nextflow self-update to update Nextflow to the latest available version."
+    println ""
+    return 1
+}
+
+def adapter_error(def input) {
+    println ""
+    println "[params.adapters] fail to open: '" + input + "' : No such file or directory"
+    println ""
+    return 1
+}
+
+def amr_error(def input) {
+    println ""
+    println "[params.amr] fail to open: '" + input + "' : No such file or directory"
+    println ""
+    return 1
+}
+
+def annotation_error(def input) {
+    println ""
+    println "[params.annotation] fail to open: '" + input + "' : No such file or directory"
+    println ""
+    return 1
+}
+
+def fastq_error(def input) {
+    println ""
+    println "[params.reads] fail to open: '" + input + "' : No such file or directory"
+    println ""
+    return 1
+}
+
+def host_error(def input) {
+    println ""
+    println "[params.host] fail to open: '" + input + "' : No such file or directory"
+    println ""
+    return 1
+}
+
+def index_error(def input) {
+    println ""
+    println "[params.host_index] fail to open: '" + input + "' : No such file or directory"
+    println ""
+    return 1
 }
