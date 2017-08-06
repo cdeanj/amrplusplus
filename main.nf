@@ -57,7 +57,7 @@ Channel
 process RunQC {
     tag { sample_id }
 
-    publishDir "${params.output}/Trimmomatic", mode: 'copy',
+    publishDir "${params.output}/RunQC", mode: 'copy',
         saveAs: { filename ->
             if(filename.indexOf("P.fastq") > 0) "Paired/$filename"
             else if(filename.indexOf("U.fastq") > 0) "Unpaired/$filename"
@@ -94,6 +94,8 @@ process RunQC {
 
 if( !params.host_index ) {
     process BuildHostIndex {
+        publishDir "${params.output}/BuildHostIndex", mode: "copy"
+
         tag { host.baseName }
 
         input:
@@ -111,7 +113,7 @@ if( !params.host_index ) {
 process AlignReadsToHost {
     tag { sample_id }
         
-    publishDir "${params.output}/Host", mode: "copy"
+    publishDir "${params.output}/AlignReadsToHost", mode: "copy"
         
     input:
         set sample_id, file(forward), file(reverse) from paired_fastq
@@ -129,7 +131,7 @@ process AlignReadsToHost {
 process RemoveHostDNA {
     tag { sample_id }
 
-    publishDir "${params.output}/Host", mode: "copy"
+    publishDir "${params.output}/RemoveHostDNA", mode: "copy"
 
     input:
         set sample_id, file(sam) from host_sam
@@ -146,7 +148,7 @@ process RemoveHostDNA {
 process BAMToFASTQ {
     tag { sample_id }
 
-    publishDir "${params.output}/Host", mode: "copy"
+    publishDir "${params.output}/BAMToFASTQ", mode: "copy"
 
     input:
         set sample_id, file(bam) from non_host_bam
@@ -182,7 +184,7 @@ if( !params.amr_index ) {
 process AlignToAMR {
      tag { sample_id }
 
-     publishDir "${params.output}/AMR", mode: "copy"
+     publishDir "${params.output}/AlignToAMR", mode: "copy"
 
      input:
          set sample_id, file(forward), file(reverse) from non_host_fastq
@@ -256,7 +258,7 @@ process RunRarefaction {
 process RunSNPFinder {
     tag { sample_id }
 
-    publishDir "${params.output}/SNPFinder", mode: "copy"
+    publishDir "${params.output}/RunSNPFinder", mode: "copy"
 
     input:
         set sample_id, file(sam) from snp_sam
