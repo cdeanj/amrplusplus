@@ -30,8 +30,13 @@ if( params.adapters ) {
     adapters = file(params.adapters) 
     if( !adapters.exists() ) exit 1, "Adapter file could not be found: ${params.adapters}" 
 }
+if( params.annotation ) {
+    annotation = file(params.annotation)
+    if( !annotation.exists() ) exit 1, "Annotation file could not be found: ${params.annotation}"
+}
 
 threads = params.threads
+threshold = params.threshold
 
 leading = params.leading
 trailing = params.trailing
@@ -184,4 +189,30 @@ process AlignToAMR {
      """
      bwa mem ${amr} ${forward} ${reverse} -t ${threads} > ${sample_id}.amr.alignment.sam
      """
+}
+
+process AnalyzeResistome {
+    tag { sample_id }
+
+    publishDir "${params.output}/AnalyzeResistome", mode: "copy"
+
+    input:
+        set sample_id, file(sam) from amr_sam
+        file annotation
+        file amr
+
+    output:
+        set sample_id, file("*.tsv") into resistome
+    
+    """
+    resistome \
+      -ref_fp ${amr} \
+      -annot_fp ${annotation} \
+      -sam_fp ${sam} \
+      -gene_fp ${sample_id}.gene.tsv \
+      -group_fp ${sample_id}.group.tsv \
+      -class_fp ${sample_id}.class.tsv \
+      -mech_fp ${sample_id}.mechanism.tsv \
+      -t ${threshold}
+    """
 }
