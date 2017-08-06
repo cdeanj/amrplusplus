@@ -36,7 +36,13 @@ if( params.annotation ) {
 }
 
 threads = params.threads
+
 threshold = params.threshold
+
+min = params.min
+max = params.max
+skip = params.skip
+samples = params.samples
 
 leading = params.leading
 trailing = params.trailing
@@ -94,7 +100,7 @@ if( !params.host_index ) {
             file(host)
 
         output:
-            file '*' into host_index
+            file '*' into (host_index)
 
         """
         bwa index ${host}
@@ -113,7 +119,7 @@ process AlignReadsToHost {
         file host
             
     output:
-        set sample_id, file("${sample_id}.host.sam") into host_sam
+        set sample_id, file("${sample_id}.host.sam") into (host_sam)
             
     """ 
     bwa mem ${host} ${forward} ${reverse} -t ${threads} > ${sample_id}.host.sam
@@ -129,7 +135,7 @@ process RemoveHostDNA {
         set sample_id, file(sam) from host_sam
 
     output:
-        set sample_id, file("${sample_id}.host.sorted.removed.bam") into non_host_bam
+        set sample_id, file("${sample_id}.host.sorted.removed.bam") into (non_host_bam)
 
     """
     samtools view -bS ${sam} | samtools sort -@ ${threads} -o ${sample_id}.host.sorted.bam
@@ -146,7 +152,7 @@ process BAMToFASTQ {
         set sample_id, file(bam) from non_host_bam
 
     output:
-        set sample_id, file("${sample_id}.non.host.R1.fastq"), file("${sample_id}.non.host.R2.fastq") into non_host_fastq
+        set sample_id, file("${sample_id}.non.host.R1.fastq"), file("${sample_id}.non.host.R2.fastq") into (non_host_fastq)
 
     """
     bedtools  \
@@ -165,7 +171,7 @@ if( !params.amr_index ) {
             file(amr)
 
         output:
-            file '*' into amr_index
+            file '*' into (amr_index)
 
         """
         bwa index ${amr}
@@ -184,7 +190,7 @@ process AlignToAMR {
          file amr
 
      output:
-         set sample_id, file("${sample_id}.amr.alignment.sam") into amr_sam
+         set sample_id, file("${sample_id}.amr.alignment.sam") into (resistome_sam, rarefaction_sam)
 
      """
      bwa mem ${amr} ${forward} ${reverse} -t ${threads} > ${sample_id}.amr.alignment.sam
@@ -197,12 +203,12 @@ process AnalyzeResistome {
     publishDir "${params.output}/AnalyzeResistome", mode: "copy"
 
     input:
-        set sample_id, file(sam) from amr_sam
+        set sample_id, file(sam) from resistome_sam
         file annotation
         file amr
 
     output:
-        set sample_id, file("*.tsv") into resistome
+        set sample_id, file("*.tsv") into (resistome)
     
     """
     resistome \
@@ -213,6 +219,36 @@ process AnalyzeResistome {
       -group_fp ${sample_id}.group.tsv \
       -class_fp ${sample_id}.class.tsv \
       -mech_fp ${sample_id}.mechanism.tsv \
+      -t ${threshold}
+    """
+}
+
+process AnalyzeRarefaction {
+    tag { sample_id }
+   
+    publishDir "${params.output}/AnalyzeRarefaction", mode: "copy"
+
+    input:
+        set sample_id, file(sam) from rarefaction_sam
+        file annotation
+        file amr
+
+    output:
+        set sample_id, file("*.tsv") into (rarefaction)
+
+    """
+    rarefaction \
+      -ref_fp ${amr} \
+      -sam_fp ${sam} \
+      -annot_fp ${annotation} \
+      -gene_fp ${sample_id}.gene.tsv \
+      -group_fp ${sample_id}.group.tsv \
+      -class_fp ${sample_id}.class.tsv \
+      -mech_fp ${sample_id}.mech.tsv \
+      -min ${min} \
+      -max ${max} \
+      -skip ${skip} \
+      -samples ${samples} \
       -t ${threshold}
     """
 }
