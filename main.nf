@@ -151,7 +151,7 @@ process BAMToFASTQ {
         set sample_id, file(bam) from non_host_bam
 
     output:
-        set sample_id, file("${sample_id}.non.host.R1.fastq"), file("${sample_id}.non.host.R2.fastq") into (non_host_fastq)
+        set sample_id, file("${sample_id}.non.host.R1.fastq"), file("${sample_id}.non.host.R2.fastq") into (non_host_fastq, non_host_fastq_kraken)
 
     """
     bedtools  \
@@ -271,6 +271,25 @@ process RunSNPFinder {
       -out_fp ${sample_id}.tsv
     """
 }
+
+process RunKraken {
+    tag { sample_id }
+
+    publishDir "${params.output}/RunKraken", mode: "copy"
+
+    input:
+       set sample_id, file(forward), file(reverse) from non_host_fastq_kraken
+
+    output:
+       set sample_id, file("${sample_id}.kraken.report") into kraken_report
+
+    """
+    kraken --preload --db ${MINIKRAKENDB} --fastq-input ${forward} ${reverse} --threads ${threads} > ${sample_id}.kraken.raw
+    kraken-report --db ${MINIKRAKENDB} ${sample_id}.kraken.raw > ${sample_id}.kraken.report
+    """
+}
+
+
 
 def nextflow_version_error() {
     println ""
