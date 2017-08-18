@@ -3,8 +3,8 @@ TODOs
 
 ### Containers
 
-- [ ] Add Kraken container
-- [ ] Add MultiQC container
+- [x] Add Kraken container
+- [x] Add MultiQC container
 - [x] Add RarefactionAnalyzer container
 - [x] Add ResistomeAnalyzer container
 - [x] Add SNPFinder container
