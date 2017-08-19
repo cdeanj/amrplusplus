@@ -22,7 +22,7 @@ def parse_cmdline_params(cmdline_params):
     parser.add_argument('-i', '--input_files', nargs='+', required=True,
                         help='Use globstar to pass a list of files, (Ex: *.tsv)')
     parser.add_argument('-o', '--output_directory', required=True,
-                        help='Output directory for writing the AMR_analytic_matrix.csv file')
+                        help='Output directory for writing the kraken_analytic_matrix.csv file')
     return parser.parse_args(cmdline_params)
 
 def dict_to_matrix(D):
