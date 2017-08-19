@@ -1,13 +1,29 @@
 #!/usr/bin/env python3
 
 import argparse
-
 import numpy as np
+import sys
+
+__author__ = "Steven Lakin"
+__copyright__ = ""
+__credits__ = ["Steven Lakin"]
+__version__ = ""
+__maintainer__ = "lakinsm"
+__email__ = "lakinsm@colostate.edu"
+__status__ = "Cows go moo."
 
 taxa_level = {'D': 0, 'P': 1, 'C': 2, 'O': 3, 'F': 4, 'G': 5, 'S': 6}
 taxa_level_names = {1: 'Domain', 2: 'Phylum', 3: 'Class', 4: 'Order',
                     5: 'Family', 6: 'Genus', 7: 'Species', 8: 'Unclassified'}
 
+def parse_cmdline_params(cmdline_params):
+    info = ""
+    parser = argparse.ArgumentParser(description=info)
+    parser.add_argument('-i', '--input_files', nargs='+', required=True,
+                        help='Use globstar to pass a list of files, (Ex: *.tsv)')
+    parser.add_argument('-o', '--output_directory', required=True,
+                        help='Output directory for writing the AMR_analytic_matrix.csv file')
+    return parser.parse_args(cmdline_params)
 
 def dict_to_matrix(D):
     ncol = len(D.keys())
@@ -25,7 +41,6 @@ def dict_to_matrix(D):
             if taxon in tdict:
                 ret[i, j] = np.float(tdict[taxon])
     return ret, unique_nodes, samples
-
 
 def kraken_load_analytic_data(file_name_list):
     ret = {}
@@ -88,7 +103,6 @@ def kraken_load_analytic_data(file_name_list):
                         ret.setdefault(sample_id, {taxon_name: float(entry[2])})
     return dict_to_matrix(ret)
 
-
 def output_kraken_analytic_data(outdir, M, m_names, n_names):
     with open(outdir + '/kraken_analytic_matrix.csv', 'w') as out:
         out.write(','.join(n_names) + '\n')
@@ -96,15 +110,7 @@ def output_kraken_analytic_data(outdir, M, m_names, n_names):
             out.write('\"{}\",'.format(m_names[i].replace(',', '')))
             out.write(','.join([str(x) for x in row]) + '\n')
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument('input_file_list', nargs='+',
-                    help='Use globstar to pass a list of files, (Ex: *.tsv)')
-parser.add_argument('output_directory',
-                    help='Output directory for writing the AMR_analytic_matrix.csv file')
-
-
 if __name__ == '__main__':
-    args = parser.parse_args()
-    K, m, n = kraken_load_analytic_data(args.input_file_list)
-    output_kraken_analytic_data(args.output_directory, K, m, n)
+    opts = parse_cmdline_params(sys.argv[1:])
+    K, m, n = kraken_load_analytic_data(opts.input_files)
+    output_kraken_analytic_data(opts.output_directory, K, m, n)
