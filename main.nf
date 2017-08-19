@@ -49,7 +49,7 @@ minlen = params.minlen
 Channel
     .fromFilePairs( params.reads, flat: true )
     .ifEmpty { exit 1, "Read pair files could not be found: ${params.reads}" }
-    .into { reads }
+    .set { reads }
 
 process RunQC {
     tag { sample_id }
@@ -207,7 +207,7 @@ process RunResistome {
         file amr
 
     output:
-        set sample_id, file("*.tsv") into (resistome)
+        file("${sample_id}.gene.tsv") into (resistome)
     
     """
     resistome \
@@ -281,7 +281,7 @@ process RunKraken {
        set sample_id, file(forward), file(reverse) from non_host_fastq_kraken
 
     output:
-       set sample_id, file("${sample_id}.kraken.report") into kraken_report
+       file("${sample_id}.kraken.report") into kraken_report
 
     """
     kraken --preload --db ${MINIKRAKENDB} --fastq-input ${forward} ${reverse} --threads ${threads} > ${sample_id}.kraken.raw
@@ -289,7 +289,45 @@ process RunKraken {
     """
 }
 
+resistome.toSortedList().set { amr_l_to_w }
 
+process AMRLongToWide {
+    tag { }
+
+    publishDir "${params.output}/AMRLongToWide", mode: "copy"
+
+    input:
+        file(resistomes) from amr_l_to_w
+
+    output:
+        file("AMR_analytic_matrix.csv") into amr_master_matrix
+
+    """
+    mkdir ret
+    python $baseDir/bin/amr_long_to_wide.py -i ${resistomes} -o ret
+    mv ret/AMR_analytic_matrix.csv .
+    """
+}
+
+kraken_report.toSortedList().set { kraken_l_to_w }
+
+process KrakenLongToWide {
+    tag { }
+
+    publishDir "${params.output}/KrakenLongToWide", mode: "copy"
+
+    input:
+        file(kraken_reports) from kraken_l_to_w
+
+    output:
+        file("kraken_analytic_matrix.csv") into kraken_master_matrix
+
+    """
+    mkdir ret
+    python $baseDir/bin/kraken_long_to_wide.py -i ${kraken_reports} -o ret
+    mv ret/kraken_analytic_matrix.csv .
+    """
+}
 
 def nextflow_version_error() {
     println ""
