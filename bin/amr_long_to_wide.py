@@ -1,11 +1,28 @@
 #!/usr/bin/env python3
 
+__author__ = "Steven Lakin"
+__copyright__ = ""
+__credits__ = ["Steven Lakin"]
+__version__ = ""
+__maintainer__ = "lakinsm"
+__email__ = "lakinsm@colostate.edu"
+__status__ = "Cows go moo."
+
 import argparse
+import sys
 
 amr_level_names = {0: 'Class', 1: 'Mechanism', 2: 'Group'}
 
+def parse_cmdline_params(cmdline_params):
+    info = ""
+    parser = argparse.ArgumentParser(description=info)
+    parser.add_argument('-i', '--input_files', nargs='+', required=True,
+                        help='Use globstar to pass a list of files, (Ex: *.tsv)')
+    parser.add_argument('-o', '--output_directory', required=True,
+                        help='Output directory for writing the AMR_analytic_matrix.csv file')
+    return parser.parse_args(cmdline_params)
 
-def amr_load_data(file_name_list, threshold):
+def amr_load_data(file_name_list):
     samples = {}
     labels = set()
     for file in file_name_list:
@@ -15,9 +32,6 @@ def amr_load_data(file_name_list, threshold):
                 if not entry:
                     continue
                 entry = entry.split('\t')
-                coverage = float(entry[3])
-                if coverage < threshold:
-                    continue
                 sample = entry[0].split('.')[0]
                 count = float(entry[2])
                 gene_name = entry[1]
@@ -30,7 +44,6 @@ def amr_load_data(file_name_list, threshold):
                         samples.setdefault(sample, {gene_name: count})
                 labels.add(gene_name)
     return samples, labels
-
 
 def output_amr_analytic_data(outdir, S, L):
     with open(outdir + '/AMR_analytic_matrix.csv', 'w') as amr:
@@ -48,17 +61,7 @@ def output_amr_analytic_data(outdir, S, L):
                     local_counts.append(str(0))
             amr.write(','.join(local_counts) + '\n')
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--input_file_list', '-i', nargs='+',
-                    help='Use globstar to pass a list of files, (Ex: *.tsv)')
-parser.add_argument('--output_directory', '-o',
-                    help='Output directory for writing the AMR_analytic_matrix.csv file')
-parser.add_argument('--threshold', '-t', type=float, default=80,
-                    help='Gene coverage threshold under which to discard counts [0, 100]')
-
-
 if __name__ == '__main__':
-    args = parser.parse_args()
-    S, L = amr_load_data(args.input_file_list, args.threshold)
-    output_amr_analytic_data(args.output_directory, S, L)
+    opts = parse_cmdline_params(sys.argv[1:])
+    S, L = amr_load_data(opts.input_files)
+    output_amr_analytic_data(opts.output_directory, S, L)
