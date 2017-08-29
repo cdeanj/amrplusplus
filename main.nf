@@ -54,11 +54,10 @@ Channel
 process RunQC {
     tag { sample_id }
 
-    publishDir "${params.output}/RunQC", mode: 'copy',
+    publishDir "${params.output}/RunQC", mode: 'copy', pattern: '*.fastq',
         saveAs: { filename ->
             if(filename.indexOf("P.fastq") > 0) "Paired/$filename"
             else if(filename.indexOf("U.fastq") > 0) "Unpaired/$filename"
-            else if(filename.indexOf(".log") > 0) "Log/$filename"
             else {}
         }
 	
@@ -68,7 +67,7 @@ process RunQC {
     output:
         set sample_id, file("${sample_id}.1P.fastq"), file("${sample_id}.2P.fastq") into (paired_fastq)
         set sample_id, file("${sample_id}.1U.fastq"), file("${sample_id}.2U.fastq") into (unpaired_fastq)
-        set sample_id, file("${sample_id}.trimmomatic.stats.log") into (trimmomatic_logs)
+        file("${sample_id}.trimmomatic.stats.log") into (trimmomatic_stats)
 
     """
     java -jar ${TRIMMOMATIC}/trimmomatic-0.36.jar \
@@ -86,6 +85,28 @@ process RunQC {
     mv ${sample_id}_2P ${sample_id}.2P.fastq
     mv ${sample_id}_1U ${sample_id}.1U.fastq
     mv ${sample_id}_2U ${sample_id}.2U.fastq
+    """
+}
+
+trimmomatic_stats.toSortedList().set { trim_stats }
+
+process QCStats {
+    tag { sample_id }
+
+    publishDir "${params.output}/RunQC", mode: 'copy',
+        saveAs: { filename ->
+            if(filename.indexOf(".stats") > 0) "Stats/$filename"
+            else {}
+        }
+
+    input:
+        file(stats) from trim_stats
+
+    output:
+	file("trimmomatic.stats")
+
+    """
+    python3 $baseDir/bin/trimmomatic_stats.py -i ${stats} -o trimmomatic.stats
     """
 }
 
@@ -128,17 +149,43 @@ process AlignReadsToHost {
 process RemoveHostDNA {
     tag { sample_id }
 
-    publishDir "${params.output}/RemoveHostDNA", mode: "copy"
+    publishDir "${params.output}/RemoveHostDNA", mode: "copy", pattern: '*.bam',
+	saveAs: { filename ->
+            if(filename.indexOf(".bam") > 0) "NonHostBAM/$filename"
+        }
 
     input:
         set sample_id, file(sam) from host_sam
 
     output:
         set sample_id, file("${sample_id}.host.sorted.removed.bam") into (non_host_bam)
+        file("${sample_id}.samtools.idxstats") into (idxstats_logs)
 
     """
     samtools view -bS ${sam} | samtools sort -@ ${threads} -o ${sample_id}.host.sorted.bam
+    samtools index ${sample_id}.host.sorted.bam && samtools idxstats ${sample_id}.host.sorted.bam > ${sample_id}.samtools.idxstats
     samtools view -h -f 4 -b ${sample_id}.host.sorted.bam -o ${sample_id}.host.sorted.removed.bam
+    """
+}
+
+idxstats_logs.toSortedList().set { host_removal_stats }
+
+process HostRemovalStats {
+    tag { sample_id }
+  
+    publishDir "${params.output}/RemoveHostDNA", mode: "copy",
+        saveAs: { filename ->
+            if(filename.indexOf(".stats") > 0) "HostRemovalStats/$filename"
+        }
+
+    input:
+        file(stats) from host_removal_stats
+
+    output:
+        file("host.removal.stats")
+
+    """
+    python3 $baseDir/bin/samtools_idxstats.py -i ${stats} -o host.removal.stats
     """
 }
 
