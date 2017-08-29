@@ -8,3 +8,5 @@ To run AmrPlusPlus, you will need the following libraries and tools installed on
     - Linux users can [download](https://docs.docker.com/engine/installation/) the most appropriate version for their Linux distribution.
   - Java 7+ (Required)
   - Nextflow (Required)
+  
+NOTE: If you choose not to install Docker, you will need to download each of the required dependencies to run the pipeline. A list of these can be found in the [Dependencies](https://github.com/cdeanj/amrplusplus/blob/master/docs/dependencies.md) section of this document.
