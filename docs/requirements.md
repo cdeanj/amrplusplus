@@ -8,4 +8,3 @@ To run AmrPlusPlus, you will need the following libraries and tools installed on
     - Linux users can [download](https://docs.docker.com/engine/installation/) the most appropriate version for their Linux distribution.
   - Java 7+ (Required)
   - Nextflow (Required)
-  - Python3 (Required)
