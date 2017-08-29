@@ -304,7 +304,7 @@ process AMRLongToWide {
 
     """
     mkdir ret
-    python $baseDir/bin/amr_long_to_wide.py -i ${resistomes} -o ret
+    python3 $baseDir/bin/amr_long_to_wide.py -i ${resistomes} -o ret
     mv ret/AMR_analytic_matrix.csv .
     """
 }
@@ -324,7 +324,7 @@ process KrakenLongToWide {
 
     """
     mkdir ret
-    python $baseDir/bin/kraken_long_to_wide.py -i ${kraken_reports} -o ret
+    python3 $baseDir/bin/kraken_long_to_wide.py -i ${kraken_reports} -o ret
     mv ret/kraken_analytic_matrix.csv .
     """
 }
@@ -382,8 +382,7 @@ def index_error(def input) {
 def help() {
     println ""
     println "Program: AmrPlusPlus"
-    println "Version: $workflow.repository - $workflow.revision [$workflow.commitId]"
-    println "Documentation: https://github.com/cdeanj/amrplusplus/blob/master/README.md"
+    println "Documentation: https://github.com/colostatemeg/amrplusplus/blob/master/README.md"
     println "Contact: Christopher Dean <cdean11@colostate.edu>"
     println ""
     println "Usage:    nextflow run main.nf [options]"
