@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+
+__author__ = "Chris Dean"
+__copyright__ = ""
+__credits__ = ["Chris Dean"]
+__version__ = ""
+__maintainer__ = "cdeanj"
+__email__ = "cdean11@colostate.edu"
+__status__ = "Cows go moo."
+
 import argparse
 import glob
 import os
