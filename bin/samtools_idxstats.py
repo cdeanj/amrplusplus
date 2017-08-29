@@ -1,0 +1,40 @@
+import argparse
+import glob
+import os
+import sys
+
+def parse_cmdline_params(cmdline_params):
+    info = "Parses a Samtools idxstats file to obtain the total number of mapped, unmapped, and total reads"
+    parser = argparse.ArgumentParser(description=info)
+    parser.add_argument('-i', '--input_files', nargs='+', required=True,
+                        help='Use globstar to pass a list of files, (Ex: *.tsv)')
+    parser.add_argument('-o', '--output_file', required=True,
+                        help='Output file to write mapping results to')
+    return parser.parse_args(cmdline_params)
+
+def header(output_file):
+    with open(output_file, 'a') as o:
+        o.write('Sample\tMapped\tUnmapped\tTotal\n')
+    o.close()
+
+def mapping_stats(input_list, output_file):
+    for f in input_list:
+        mapped = 0
+        unmapped = 0
+        number_of_reads = 0
+        with open(f, 'r') as f:
+            sample_name = os.path.basename(str(f.name)).split('.', 1)[0]
+            for line in f:
+                columns = line.strip().split('\t')
+                mapped += int(columns[2])
+                unmapped += int(columns[3])
+            number_of_reads += mapped + unmapped
+        f.close()
+        with open(output_file, 'a') as o:
+            o.write(sample_name + '\t' + str(mapped) + '\t' + str(unmapped) + '\t' + str(number_of_reads) + '\n')
+        o.close()
+
+if __name__ == "__main__":
+    opts = parse_cmdline_params(sys.argv[1:])
+    header(opts.output_file)
+    mapping_stats(opts.input_files, opts.output_file)
