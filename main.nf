@@ -13,7 +13,7 @@ if( !nextflow.version.matches('0.25+') ) {
 }
 if( params.host_index ) { 
     host_index = Channel.fromPath(params.host_index).toSortedList() 
-    if( !host_index.exists() ) return index_error(host_index)
+    //if( host_index.isEmpty() ) return index_error(host_index)
 }
 if( params.host ) { 
     host = file(params.host) 
