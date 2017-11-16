@@ -22,9 +22,9 @@ env {
 Customize Command-line Options
 ------------------------------
 
-The params section allows you to set the different commmandl-ine options that can be used within the pipeline. Here, you can specify input/output options, trimming options, and algorithm options.
+The params section allows you to set the different commmand-line options that can be used within the pipeline. Here, you can specify input/output options, trimming options, and algorithm options.
 
-If you intend to run multiple samples in parallel, you must specify a glob pattern for your sequence data as shown in the **reads** parameter. For more information on globs, please see this related [article](https://en.wikipedia.org/wiki/Glob_(programming)).
+If you intend to run multiple samples in parallel, you must specify a glob pattern for your sequence data as shown for the **reads** parameter. For more information on globs, please see this related [article](https://en.wikipedia.org/wiki/Glob_(programming)).
 
 ```bash
 params {
