@@ -255,6 +255,9 @@ process RunResistome {
 
     output:
         file("${sample_id}.gene.tsv") into (resistome)
+	file("${sample_id}.group.tsv") into (group_level)
+	file("${sample_id}.class.tsv") into (class_level)
+	file("${sample_id}.mechanism.tsv") into (mechanism_level)
     
     """
     resistome \
