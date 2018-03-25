@@ -34,6 +34,9 @@ Run a Simple Test
 We will run a small sample dataset that comes with the pipeline source code. As such, we will not be specifying any input paths as they have already been included. During the program's execution, the required tool dependencies will be installed with Docker if they haven't been already. As there are many tool dependencies, this could take some time depending on your connection speed.
 
 ```bash
+# pull docker containers from Dockerhub (if this command times out, try running it once more)
+$ docker pull colostatemeg/amrplusplus -a
+
 # command to run the amrplusplus pipeline
 $ nextflow run main.nf -profile docker --threads 4 --output test
 
