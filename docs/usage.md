@@ -3,7 +3,7 @@ Usage
 
 ### Display Help Message
 
-The `help` parameter displays the available options and commands.
+The `help` parameter displays the available pipeline options and commands.
 ```
 $ nextflow run auir.nf --help
 ```
@@ -71,8 +71,8 @@ $ nextflow run main.nf \
     --leading 3 \
     --trailing 3 \
     --minlen 36 \
-    --slidingwindow 4 \
-    --adapters "data/adapters/nextera.fa"
+    --slidingwindow 4:15 \
+    --adapters "data/adapters/nextera.fa" \
     --output "test/"
 ```
 
