@@ -7,7 +7,7 @@ The pipeline source code comes with a configuration file that can be used to set
 Customize Environment Variables
 -------------------------------
 
-By default, the pipeline uses the default minikraken database (~4GB) to classify and assign taxonomic labels to your sequences. As Kraken loads this database into memory, this mini database is particularly useful for people who do not have access to large memory servers. If you would like to use a custom database or the standard Kraken database (~160GB), you will need to build it yourself and modify the **MINIKRAKENDB** environment variable to point to its location on your machine.
+By default, the pipeline uses a default minikraken database (~4GB) to classify and assign taxonomic labels to sequences. As Kraken loads this database into memory, it is particularly useful for servers without lots of RAM. If you would like to use a custom database or the standard Kraken database (~160GB), you will need to build it yourself and modify the **MINIKRAKENDB** environment variable to point to its location on your machine.
 
 ```bash
 env {
@@ -22,7 +22,7 @@ env {
 Customize Command-line Options
 ------------------------------
 
-The params section allows you to set the different commmand-line options that can be used within the pipeline. Here, you can specify input/output options, trimming options, and algorithm options.
+The params section allows you to set different commmand-line options for different tools within the pipeline. Here, you can specify input/output options, trimming options, and other algorithm options.
 
 If you intend to run multiple samples in parallel, you must specify a glob pattern for your sequence data as shown for the **reads** parameter. For more information on globs, please see this related [article](https://en.wikipedia.org/wiki/Glob_(programming)).
 
