@@ -9,7 +9,7 @@ Setup
 We will go over a typical pipeline setup scenario in which you connect to a remote server, install Nextflow, and download the pipeline source code.
 
 ```bash
-# username and host address (only necessary if you will be running the pipeline from a remove server)
+# username and host address (only necessary if you will be running the pipeline from a remote server)
 $ ssh [USER]@[HOST]
 
 # install Nextflow
